@@ -19,19 +19,15 @@ jobs:
           url: 'https://note.sarisia.cc/index.xml'
           file: 'README.md'
           timezone: 'Asia/Tokyo'
-      - name: push to master
-        if: steps.feed.outputs.changed == true
-        run: |
-          git config --global user.name "${{ github.actor }}"
-          git config --global user.email "${{ github.actor }}@users.noreply.github.com"
-          git add .
-          git commit -m "docs: update feed"
-          git push
+      - uses: sarisia/actions-commit@master
+        id: commit
+        with:
+          message: action test
       - uses: sarisia/actions-status-discord@v1
-        if: steps.feed.outputs.changed == true
+        if: always()
         with:
           webhook: ${{ secrets.DISCORD_WEBHOOK }}
-          title: update readme with blog feed
+          description: ${{ steps.commit.outputs.changed == true }}
   tweet:
     runs-on: ubuntu-latest
     needs: readme
